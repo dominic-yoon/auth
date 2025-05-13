@@ -1,5 +1,7 @@
 package com.dominic.auth.infrastructure.security;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -11,6 +13,7 @@ import com.dominic.auth.domain.model.User;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -35,27 +38,33 @@ public class JwtProvider {
 	// 1. SecretKey 초기화
 	@PostConstruct
 	public void init() {
-		this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes());
+		byte[] bytes = Base64.getDecoder().decode(secretKeyString);
+		// byte[] bytes = secretKeyString.getBytes(StandardCharsets.UTF_8);
+		this.secretKey = Keys.hmacShaKeyFor(bytes);
 	}
 
 	// 2. Access Token 생성
 	public String createAccessToken(User user) {
 		return Jwts.builder()
-			.setSubject(user.getUsername())
+			.setSubject(user.getId().toString())
+			.claim("username", user.getUsername())
 			.claim("role", user.getRole().name())
 			.setIssuedAt(new Date(System.currentTimeMillis()))
 			.setExpiration(new Date(System.currentTimeMillis() + accessExpiration))
-			.signWith(secretKey)
+			.signWith(secretKey, SignatureAlgorithm.HS256)
+			.setHeaderParam("typ", "JWT")
 			.compact();
 	}
 
 	// 3. Refresh Token 생성
 	public String createRefreshToken(User user) {
 		return Jwts.builder()
-			.setSubject(user.getUsername())
+			.setSubject(user.getId().toString())
+			.claim("username", user.getUsername())
 			.setIssuedAt(new Date(System.currentTimeMillis()))
 			.setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
-			.signWith(secretKey)
+			.signWith(secretKey, SignatureAlgorithm.HS256)
+			.setHeaderParam("typ", "JWT")
 			.compact();
 	}
 
