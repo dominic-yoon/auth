@@ -47,7 +47,6 @@ public class JwtProvider {
 	public String createAccessToken(User user) {
 		return Jwts.builder()
 			.setSubject(user.getUsername())
-			.claim("username", user.getUsername())
 			.claim("role", user.getRole().name())
 			.setIssuedAt(new Date(System.currentTimeMillis()))
 			.setExpiration(new Date(System.currentTimeMillis() + accessExpiration))
@@ -60,7 +59,6 @@ public class JwtProvider {
 	public String createRefreshToken(User user) {
 		return Jwts.builder()
 			.setSubject(user.getUsername())
-			.claim("username", user.getUsername())
 			.setIssuedAt(new Date(System.currentTimeMillis()))
 			.setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
 			.signWith(secretKey, SignatureAlgorithm.HS256)
