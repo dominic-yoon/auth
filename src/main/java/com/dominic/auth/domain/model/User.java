@@ -54,4 +54,8 @@ public class User {
 			.role(Role.USER)
 			.build();
 	}
+
+	public void updateRole() {
+		this.role = Role.ADMIN;
+	}
 }

@@ -46,7 +46,7 @@ public class JwtProvider {
 	// 2. Access Token 생성
 	public String createAccessToken(User user) {
 		return Jwts.builder()
-			.setSubject(user.getId().toString())
+			.setSubject(user.getUsername())
 			.claim("username", user.getUsername())
 			.claim("role", user.getRole().name())
 			.setIssuedAt(new Date(System.currentTimeMillis()))
@@ -59,7 +59,7 @@ public class JwtProvider {
 	// 3. Refresh Token 생성
 	public String createRefreshToken(User user) {
 		return Jwts.builder()
-			.setSubject(user.getId().toString())
+			.setSubject(user.getUsername())
 			.claim("username", user.getUsername())
 			.setIssuedAt(new Date(System.currentTimeMillis()))
 			.setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
